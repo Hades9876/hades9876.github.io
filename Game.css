@@ -12,6 +12,10 @@ select {
     width: 30%;
 }
 
+h1 {
+    margin-right: 250px;
+}
+
 .Start_button {
     width: 10%;
 }
@@ -30,8 +34,6 @@ select {
 }
 
 .container {
-    /* background-image: url(https://source.unsplash.com/random); */
-    /* background-color: aqua; */
     height: 90%;
     width: 85%;
     display: flex;
@@ -41,7 +43,6 @@ select {
 .column {
     height: 95%;
     margin: 1%;
-    /* background-color: black; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -54,10 +55,6 @@ select {
     margin-top: 5%;
     margin-bottom: 5%;
 }
-
-/* .holder:hover > .card {
-    transform: rotateY(180deg);
-} */
 
 .holder.flipped .card {
     transform: rotateY(180deg);
