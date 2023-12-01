@@ -1,10 +1,11 @@
 let stack = [];
-// const push = (item) => stack.push(item);
-// const pop = () => stack.pop();
 let cards_flipped = 0, correct = 0;
 let vals = [];
 var col = document.querySelector('.columns');
-var row = document.querySelector('.rows');
+let [sec, min, hour] = [0, 0, 0];
+let displayTime = document.getElementById('display-time');
+let timer = null;
+let nums = [];
 
 document.addEventListener("DOMContentLoaded", function () {
     var o = document.createElement('option');
@@ -12,41 +13,26 @@ document.addEventListener("DOMContentLoaded", function () {
     o.value = -1;
     col.add(o);
 
-    var p = document.createElement('option');
-    p.text = '----';
-    p.value = -1;
-    row.add(p);
-
-    for(let i=1; i<=7; i++)
+    for(let i=1; i<=4; i++)
     {
         var option = document.createElement('option');
-        option.text = i;
-        option.value = i;
+        option.text = 2*i;
+        option.value = 2*i;
         col.add(option);
-    }
-
-    for(let i=1; i<5; i++)
-    {
-        var option = document.createElement('option');
-        option.text = i;
-        option.value = i;
-        row.add(option);
     }
 });
 
 function Start() {
-    if (row.value == -1 || col.value == -1)
+    if (col.value == -1)
         alert('Please choose a value for row and columns'); 
-    else if (row.value % 2 != 0 && col.value % 2 != 0)
-        alert('Not possible to create a board with these parameters');  
     else {
-        let r = row.value, c = col.value;
-        // let r = 2, c = 3;
+        let c = col.value;
         vals = [];
         stack = [];
+        nums = [];
         correct = 0;
         cards_flipped = 0;
-        for(let i=0; i<r; i++)
+        for(let i=0; i<c; i++)
         {
             let arr = [];
             for(let j=0; j<c; j++)
@@ -55,36 +41,37 @@ function Start() {
         }
         var container = document.querySelector('.container');
         container.innerHTML = '';
-        var x = r * c / 2;
+        var x = c * c / 2;
         for(let i=0; i<x; i++)
         {
             let x1, x2, y1, y2, q;
             do {
-                x1 = Math.floor(Math.random() * r);
+                x1 = Math.floor(Math.random() * c);
                 y1 = Math.floor(Math.random() * c);
             }
             while(vals[x1][y1] != 0);
             do {
-                x2 = Math.floor(Math.random() * r);
+                x2 = Math.floor(Math.random() * c);
                 y2 = Math.floor(Math.random() * c);
             }
             while (vals[x2][y2] != 0 || (x1 == x2 && y1 == y2));
             do {
-                q = Math.floor(Math.random() * 100) + 1;
+                q = Math.floor(Math.random() * x) + 1;
             }
-            while(vals.includes(q));
+            while(nums.includes(q));
+            nums.push(q);
             vals[x1][y1] = q;
             vals[x2][y2] = q;
         }
         console.log(vals);
-        createBoard(r, c);
+        createBoard(c, c);
     }
 }
 
 function createBoard(rows, columns) {
     stack = [];
     cards_flipped = 0;
-    const container = document.querySelector(".container");
+    let container = document.querySelector(".container");
     for (let c = 0; c < columns; c++) {
         var column = document.createElement('div');
         column.style.width = (100/columns) + '%';
@@ -109,6 +96,13 @@ function createBoard(rows, columns) {
         }
         container.appendChild(column);
     }
+    const q = document.getElementById('Card00');
+    let fontSize = Math.min(q.clientHeight, q.clientWidth) * 0.8;
+    container.style.fontSize = fontSize+'px';
+    console.log(fontSize);
+    [sec, min, hour] = [0, 0, 0];
+    displayTime.innerHTML = '00 : 00 : 00';
+    watchStart();
 }
 
 function flip(n) {
@@ -130,7 +124,7 @@ function flip(n) {
             correct += 2;
         cards_flipped = 0;
     }
-    if(correct == row.value * col.value)
+    if(correct == col.value * col.value)
     {
         setTimeout(function() {
             createPopup();
@@ -139,6 +133,7 @@ function flip(n) {
 }
 
 function createPopup() {
+    clearInterval(timer);
     var popup = document.createElement('div');
     popup.className = 'popup';
     var link = document.createElement('a');
@@ -151,8 +146,40 @@ function createPopup() {
     button.className = 'close-button';
     button.addEventListener('click', () => {
         document.body.removeChild(popup);
-    })
+    });
     popup.appendChild(button);
 
+    let h = hour < 10 ? '0' + hour : hour;
+    let m = min < 10 ? '0' + min : min;
+    let s = sec < 10 ? '0' + sec : sec;
+    var time = document.createElement('label');
+    time.textContent = 'Time taken: '+h+' : '+m+' : '+s;
+    popup.append(time);
+
     document.body.appendChild(popup);
+}
+
+function watchStart() {
+    if(timer != null)
+        clearInterval(timer);
+    timer = setInterval(stopwatch, 1000);
+}
+
+function stopwatch() {
+    sec++;
+    if(sec == 60)
+    {
+        sec = 0;
+        min++;
+        if(min == 60)
+        {
+            min = 0;
+            hour++;
+        }
+    }
+
+    let h = hour < 10 ? '0' + hour : hour;
+    let m = min < 10 ? '0' + min : min;
+    let s = sec < 10 ? '0' + sec : sec;
+    displayTime.innerHTML = h + ' : ' + m + ' : ' + s;
 }
